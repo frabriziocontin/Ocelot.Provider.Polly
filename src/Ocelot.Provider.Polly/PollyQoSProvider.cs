@@ -26,6 +26,12 @@ namespace Ocelot.Provider.Polly
                 .Handle<HttpRequestException>()
                 .Or<TimeoutRejectedException>()
                 .Or<TimeoutException>()
+                 .OrResult<HttpResponseMessage>(response =>
+                    response.StatusCode == HttpStatusCode.RequestTimeout ||
+                    response.StatusCode == HttpStatusCode.BadGateway ||
+                    response.StatusCode == HttpStatusCode.GatewayTimeout ||
+                    response.StatusCode == HttpStatusCode.ServiceUnavailable
+                )
                 .CircuitBreakerAsync(
                     exceptionsAllowedBeforeBreaking: reRoute.QosOptions.ExceptionsAllowedBeforeBreaking,
                     durationOfBreak: TimeSpan.FromMilliseconds(reRoute.QosOptions.DurationOfBreak),
